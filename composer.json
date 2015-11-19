@@ -1,0 +1,28 @@
+{
+  "name" : "mobnia/paga-demo",
+
+  "description": "A demo of Paga API integration for Startup Weekend Lagos 2015",
+
+  "keywords": [
+    "startup",
+    "weekend",
+    "api",
+    "paga",
+    "integration"
+  ],
+
+  "homepage": "http://paga-demo.mobnia.com",
+
+  "authors": [
+    {
+      "name": "Obinna Agba",
+      "email": "obinna@mobnia.com",
+      "homepage": "http://www.mobnia.com",
+      "role": "developer"
+    }
+  ],
+
+  "require":{
+    "klein/klein": "2.1.0"
+  }
+}
