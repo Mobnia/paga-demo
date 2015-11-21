@@ -8,6 +8,10 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+include_once('curl.php');
+
+use GuzzleHttp\Client;
+
 $klein = new \Klein\Klein();
 
 function getBase($project = NULL, $project_dir = NULL, $scheme = NULL) {
@@ -102,6 +106,71 @@ $klein->respond('POST', '/pay?/?', function(\Klein\Request $request, \Klein\Resp
         'url' => $url
     ]);
 
+});
+
+
+$klein->respond(array('GET', 'POST'), '/return?/?', function(\Klein\Request $request, \Klein\Response $response){
+    $data = $_REQUEST;
+
+    $status = $data['status']?: null;
+    if (!$status){
+        // TODO redirect the user to a failure page
+    }
+    $status = strtolower($status);
+    switch ($status){
+        case "success":
+            return $response->json("Payment successful");
+
+        case "error_other":
+            return $response->json("some hold up from paga servers");
+
+        case "error_cancelled":
+            return $response->json("The user cancelled the request");
+
+        default:
+            return $response->json("Unknown status, do some really cools stuff here");
+    }
+});
+
+$klein->respond(array('GET', 'POST'), '/paid?/?', function(\Klein\Request $request, \Klein\Response $response){
+    $data = $_REQUEST;
+    return $response->json($data);
+});
+
+$klein->respond(array('GET', 'POST'), '/redirect?/?', function(\Klein\Request $request, \Klein\Response $response) use ($pagaCredentials){
+    $data = $_REQUEST;
+    $query = $request->paramsGet() ? $request->paramsGet()->all() : [];
+    $data = array_merge($data, $query);
+    if (isset($data['error'])){
+        return $response->json($data);
+    }
+
+
+    $url = "https://mypaga.com/paga-webservices/oauth2/token";
+    $handler = new \GuzzleHttp\Handler\CurlHandler();
+    $stack = \GuzzleHttp\HandlerStack::create($handler);
+    $client = new Client(['base_uri'=> $url, 'handler'=>$stack]);
+    $auth = [$pagaCredentials['client_id'], $pagaCredentials['credentials']];
+    $payload = [
+        'grant_type' => "authorization_code",
+        'redirect_uri' => $pagaCredentials['redirect_uri'],
+        'code' => $data['code'],
+        'scope' => $pagaCredentials['scope']
+    ];
+    $dataString = "";
+    foreach($payload as $key=>$value){
+        $dataString.=$key.'='.$value;
+    }
+
+    $curl = new Curl();
+    $curl->setHeader('Authorization',  "Basic ".base64_encode($pagaCredentials['client_id'].":".$pagaCredentials['credentials']));
+    //$curl->setHeader('Content-Type', 'application/json');
+    $curl->setOpt(CURLOPT_SSL_VERIFYHOST, false);
+    $curl->setOpt(CURLOPT_SSL_VERIFYPEER, false);
+
+    $curl->post($url, $payload);
+    $pagaResponse = $curl->response;
+    return $response->json($pagaResponse);
 });
 
 $klein->dispatch();
