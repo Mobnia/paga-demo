@@ -49,15 +49,12 @@ $cartItems = [
     ],
 ];
 
-$pagaCredentials = [
-    "principal" => "",
-    "client_id" => "E0B62936-F8BB-4713-9AC1-8C5127A050C2",
-    "scope" => "MERCHANT_PAYMENT MONEY_TRANSFER",
-    "redirect_uri" => getBase()."/redirect",
-    "return_url" => getBase()."/paid",
-    "response_type" => "code",
-    "auth_url" => "https://mypaga.com/paga-webservices/oauth2/authorization/"
-];
+$pagaCredentials = json_decode(file_get_contents("credentials.json"), true);
+$pagaCredentials = $pagaCredentials['paga_credentials'];
+$pagaCredentials = array_merge($pagaCredentials, [
+    'redirect_uri' => getBase()."/redirect",
+    "return_url" => getBase()."/paid"
+]);
 
 $klein->respond('GET', '/', function(\Klein\Request $request, \Klein\Response $response, \Klein\ServiceProvider $service) use($cartItems){
     $service->title = "Checkout Cart";

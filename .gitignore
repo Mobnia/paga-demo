@@ -2,4 +2,4 @@
 vendor/
 composer.lock
 *.xcf
-index1.html
+credentials.json

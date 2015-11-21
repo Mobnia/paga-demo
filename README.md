@@ -7,6 +7,18 @@
 This demo uses the [Paga Connect] API to allow users pay for products with either a Verve, Visa or Master Card.
 This use case is especially useful when providing payment options for users who may not have a paga account.
 
+To run this demo, create a credentials.json file in the root folder. A sample file is shown below
+```json
+{
+  "paga_credentials" : {
+    "principal" : "",
+    "client_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+    "scope": "MERCHANT_PAYMENT MONEY_TRANSFER",
+    "response_type" : "code",
+    "auth_url": "https://mypaga.com/paga-webservices/oauth2/authorization/"
+  }
+}
+```
 
 You can view this demo live [here](http://paga-demo.mobnia.com "Paga API Demo")
 
@@ -20,11 +32,6 @@ etc.
 
 For a full list of the available options check the  [Paga Connect] documentation.
 
-
-<<<<<<< HEAD
-
-=======
->>>>>>> 67c8e8cc87fec34d0577bef82162f9f79f961044
 > ###### This demo is brought to you by [Mobnia] &copy;2015
 
 
